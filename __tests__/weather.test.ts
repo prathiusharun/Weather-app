@@ -1,12 +1,13 @@
-import { expect, test } from 'vitest'
-import { fetchWeather } from '@/app/actions'
+import { addCity } from "../app/actions"; // Change this
+import { test, expect } from "vitest";
 
-test('fetchWeather returns valid data structure for Ottapalam', async () => {
-  // We execute the Server Action
-  const data = await fetchWeather('Ottapalam');
+test('addCity returns success for Ottapalam', async () => {
+  // Create a mock FormData object
+  const formData = new FormData();
+  formData.append("city", "Ottapalam");
+
+  const result = await addCity(formData);
   
-  // We assert that the returned object has the temperature property
-  expect(data).toHaveProperty('temp');
-  expect(typeof data.temp).toBe('number');
-  expect(data.name).toBeDefined();
+  // Assert based on our return { success: true } logic
+  expect(result.success).toBe(true);
 });
