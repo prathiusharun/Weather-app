@@ -1,44 +1,21 @@
-# Weather Engine ☁️
+# 🌦️ Weather.IO - Next.js 16 + Prisma 7
 
-A full-stack weather tracking application built with **Next.js 15**, **Prisma**, and **PostgreSQL**.
+A high-performance weather dashboard built with the latest **MERN-adjacent** stack. It leverages server actions for instant database updates and a glassmorphism UI.
 
 ## 🚀 Features
-- **Real-time API:** Fetches live weather data from OpenWeatherMap.
-- **Persistent Storage:** Saves searched cities to a PostgreSQL database.
-- **Server Actions:** Uses Next.js Server Actions for secure API calls and DB mutations.
-- **Dynamic UI:** Instant updates using `revalidatePath` without manual page refreshes.
+- **Dark/Light Mode**: Custom state-based theme switching with Tailwind v4.
+- **Server Actions**: Direct database mutations without API route boilerplate.
+- **Idempotent Upserts**: Prevents duplicate city entries using Prisma `upsert`.
+- **Glassmorphism UI**: High-end aesthetic using Backdrop Blur and Slate palettes.
 
 ## 🛠️ Tech Stack
-- **Framework:** Next.js (App Router)
-- **Language:** TypeScript
-- **Database:** PostgreSQL (Supabase/Local)
-- **ORM:** Prisma
-- **Validation:** Zod (for API safety)
-- **Styling:** Tailwind CSS
+- **Framework**: Next.js 16 (Turbopack)
+- **Database**: PostgreSQL (Prisma ORM v7.6.0)
+- **Styling**: Tailwind CSS v4
+- **Icons**: Lucide React
 
-## 📋 Setup Instructions
-1. **Environment Variables:**
-   Create a `.env` file in the root:
-   ```env
-   DATABASE_URL="your_postgresql_url"
-   OPENWEATHER_API_KEY="your_api_key"
+## 📦 Installation
 
-   Install Dependencies:
-
-Bash
-npm install
-Database Setup:
-
-Bash
-npx prisma generate
-npx prisma db push
-Run Development Server:
-
-Bash
-npm run dev
-📂 Project Structure
-/app/page.tsx: Main UI and Search logic.
-
-/app/actions.ts: Server-side API fetching and Prisma logic.
-
-/prisma/schema.prisma: Database model for Saved Cities.
+1. **Clone & Install**:
+   ```bash
+   npm install

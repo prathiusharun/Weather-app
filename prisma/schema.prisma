@@ -1,21 +1,19 @@
-// prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  
-  
-
+ 
 }
 
 model SavedCity {
   id        String   @id @default(cuid())
-  name      String @unique
+  name      String   @unique
   country   String?
   lat       Float
   lon       Float
+  temp      Int?
+  condition String?
   createdAt DateTime @default(now())
 }
