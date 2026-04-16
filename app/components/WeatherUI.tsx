@@ -2,15 +2,34 @@
 
 import { useRef, useState, useEffect } from "react";
 import { addCity, deleteCity } from "../actions";
-import { Sun, Moon, Trash2, MapPin } from "lucide-react";
+import { 
+  Sun, 
+  Moon, 
+  Trash2, 
+  MapPin, 
+  Cloud, 
+  CloudRain, 
+  CloudLightning, 
+  CloudSnow, 
+  Wind 
+} from "lucide-react";
+
+// Helper component to handle dynamic icons
+const WeatherIcon = ({ condition, className }: { condition: string, className?: string }) => {
+  const c = condition.toLowerCase();
+  if (c.includes("clear")) return <Sun className={`${className} text-yellow-400`} />;
+  if (c.includes("cloud")) return <Cloud className={`${className} text-slate-400`} />;
+  if (c.includes("rain") || c.includes("drizzle")) return <CloudRain className={`${className} text-blue-400`} />;
+  if (c.includes("thunder")) return <CloudLightning className={`${className} text-purple-400`} />;
+  if (c.includes("snow")) return <CloudSnow className={`${className} text-blue-100`} />;
+  return <Wind className={`${className} text-slate-300`} />;
+};
 
 export default function WeatherUI({ savedCities = [] }: { savedCities: any[] }) {
-  // 1. Initialize state from localStorage if available, otherwise default to dark
   const [isDark, setIsDark] = useState(true);
   const [mounted, setMounted] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
-  // 2. Handle Initial Mounting (Prevents Hydration Errors)
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme) {
@@ -19,10 +38,8 @@ export default function WeatherUI({ savedCities = [] }: { savedCities: any[] }) 
     setMounted(true);
   }, []);
 
-  // 3. Sync theme with the HTML element
   useEffect(() => {
     if (!mounted) return;
-
     const root = window.document.documentElement;
     if (isDark) {
       root.classList.add("dark");
@@ -33,7 +50,6 @@ export default function WeatherUI({ savedCities = [] }: { savedCities: any[] }) 
     }
   }, [isDark, mounted]);
 
-  // Prevent rendering until mounted to ensure icons and colors match localStorage
   if (!mounted) return <div className="min-h-screen bg-slate-50 dark:bg-[#020617]" />;
 
   return (
@@ -52,7 +68,6 @@ export default function WeatherUI({ savedCities = [] }: { savedCities: any[] }) 
             className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl hover:scale-110 transition-all active:scale-90"
             aria-label="Toggle Theme"
           >
-            {/* Logic swap: If Dark, show Sun (to go light). If Light, show Moon (to go dark) */}
             {isDark ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className="text-blue-600" />}
           </button>
         </nav>
@@ -83,8 +98,14 @@ export default function WeatherUI({ savedCities = [] }: { savedCities: any[] }) 
         {/* Weather Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {savedCities.map((city) => (
-            <div key={city.id} className="group relative bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-8 rounded-[2.5rem] shadow-xl hover:shadow-2xl transition-all duration-300">
-              <div className="flex justify-between items-start mb-10">
+            <div key={city.id} className="group relative bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-8 rounded-[2.5rem] shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden">
+              
+              {/* Subtle Background Icon for "Senior" Polish */}
+              <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                 <WeatherIcon condition={city.condition || "Clear"} className="w-32 h-32" />
+              </div>
+
+              <div className="flex justify-between items-start mb-10 relative z-10">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <MapPin size={14} className="text-blue-500 opacity-70" />
@@ -97,10 +118,13 @@ export default function WeatherUI({ savedCities = [] }: { savedCities: any[] }) 
                 </div>
               </div>
 
-              <div className="flex justify-between items-end">
-                <span className="px-5 py-2 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-black tracking-widest uppercase">
-                  {city.condition || "Clear"}
-                </span>
+              <div className="flex justify-between items-end relative z-10">
+                <div className="flex items-center gap-3">
+                  <WeatherIcon condition={city.condition || "Clear"} className="w-6 h-6" />
+                  <span className="px-5 py-2 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-black tracking-widest uppercase">
+                    {city.condition || "Clear"}
+                  </span>
+                </div>
                 <button 
                   onClick={() => deleteCity(city.id)}
                   className="p-3 text-slate-300 hover:text-red-500 transition-colors"

@@ -18,7 +18,7 @@ export async function addCity(formData: FormData) {
       where: { name: data.name },
       update: {
         temp: Math.round(data.main.temp),
-        condition: data.weather[0].main,
+        condition: data.weather[0].main || "Clear",
       },
       create: {
         name: data.name,
@@ -26,7 +26,7 @@ export async function addCity(formData: FormData) {
         lat: data.coord.lat,
         lon: data.coord.lon,
         temp: Math.round(data.main.temp),
-        condition: data.weather[0].main,
+        condition: data.weather[0].main || "CLear",
       },
     });
 
