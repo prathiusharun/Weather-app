@@ -1,129 +1,165 @@
-# 🌦️ Weather.IO — Performance-Optimized Weather System
+# Weather.IO — Performance Optimized Weather System
 
-A full-stack weather application built with Next.js, TypeScript, and PostgreSQL, focused on **real-world system performance, caching, and efficiency optimization** rather than just UI.
-
----
-
-## 🚀 Live Demo
-
-  https://weather-ey07179ip-shadows5-projects.vercel.app/
+A full stack weather application built with Next.js, TypeScript, and PostgreSQL, focused on latency optimization, system design, and efficient data flow.
 
 ---
 
-## 🧠 Why This Project Exists
+## Live Demo
 
-Most weather apps are simple API wrappers.
+https://weather-ey07179ip-shadows5-projects.vercel.app/
+
+---
+
+## Why This Project Exists
+
+Most weather applications are simple API wrappers that block on external requests.
 
 This project focuses on:
 
-* reducing latency
-* optimizing backend efficiency
-* designing real-world caching strategies
-* understanding system bottlenecks
+* removing API latency from the user experience
+* designing a read optimized system
+* applying real world caching strategies
+* understanding backend performance bottlenecks
 
 ---
 
-## ⚡ Performance Improvements
+## Performance Metrics (Lighthouse)
 
-| Optimization                          | Impact                                              |
-| ------------------------------------- | --------------------------------------------------- |
-| API Caching (in-memory)               | Eliminated redundant external API calls             |
-| DB Write Optimization                 | Prevented unnecessary writes using change detection |
-| ISR (Incremental Static Regeneration) | Reduced page load latency from ~2.5s → ~400ms       |
-| Selective Queries (Prisma)            | Reduced payload size and improved response time     |
-| Conditional Cache Invalidation        | Avoided unnecessary re-renders                      |
+### Mobile
 
----
+* First Contentful Paint: 0.8s
+* Largest Contentful Paint: 2.1s
+* Total Blocking Time: 540ms
+* Speed Index: 2.2s
 
-## 📊 Before vs After
+### Desktop
 
-| Metric          | Before        | After                |
-| --------------- | ------------- | -------------------- |
-| Page Load Time  | ~2.5s         | ~400–500ms           |
-| API Calls       | Every request | Cached (30s)         |
-| DB Writes       | Always        | Only on change       |
-| System Behavior | Inconsistent  | Stable + predictable |
+* First Contentful Paint: 0.2s
+* Largest Contentful Paint: 0.6s
+* Total Blocking Time: 80ms
+* Speed Index: 1.3s
 
 ---
 
-## 🏗️ System Architecture
+## Before vs After Optimization
+
+| Metric          | Before       | After          |
+| --------------- | ------------ | -------------- |
+| Response Time   | ~2.5s        | ~500–700ms     |
+| API Calls       | Blocking     | Asynchronous   |
+| Data Source     | External API | Database First |
+| User Experience | Delayed      | Instant        |
+
+---
+
+## System Architecture
+
+This system separates read and write paths to eliminate external API latency from user requests.
 
 ```mermaid
 flowchart TD
-A[User Request] --> B[Next.js Server Action]
-B --> C{Cache Layer}
-C -->|Hit| D[Return Cached Data]
-C -->|Miss| E[Fetch from Weather API]
-E --> F[Change Detection]
-F -->|No Change| G[Skip DB]
-F -->|Change| H[Update DB]
-H --> I[PostgreSQL]
-G --> J[ISR Cache]
-I --> J
-J --> K[UI Render]
+
+subgraph Client
+A[User Request]
+end
+
+subgraph Server
+B[Server Action]
+C[Database]
+D[UI Response]
+end
+
+subgraph Background
+E[Async Worker]
+F[External API]
+G[Data Processing]
+end
+
+A --> B
+B --> C
+C --> D
+
+B -. async .-> E
+E --> F
+F --> G
+G --> C
+
+C --> D
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## Core Engineering Idea
 
-* **Frontend:** Next.js, React, Tailwind CSS
-* **Backend:** Node.js, Server Actions
-* **Database:** PostgreSQL (Prisma ORM)
-* **Deployment:** Vercel / Render
-* **Tools:** GitHub Actions, Docker (optional)
+### Traditional Approach
 
----
+User waits for external API before seeing data.
 
-## 🧩 Key Engineering Decisions
+### Implemented Approach
 
-### 1. Why caching?
+Database is treated as the primary data source. External API runs in the background.
 
-To reduce latency and external API dependency.
+```ts
+refreshWeather(city)
+```
 
-### 2. Why conditional DB writes?
-
-Database operations are expensive — unnecessary writes degrade performance.
-
-### 3. Why ISR instead of full SSR?
-
-To balance freshness and speed using controlled revalidation.
-
-### 4. Why selective queries?
-
-To minimize payload and improve response time.
+This removes external latency from the critical request path.
 
 ---
 
-## ⚠️ Trade-offs
+## Architecture Overview
 
-* In-memory cache resets on server restart
-* Weather data may be slightly stale (≤30s)
-* No distributed caching (future improvement)
+* Frontend: Next.js App Router, React, Tailwind CSS
+* Backend: Next.js Server Actions
+* Database: PostgreSQL with Prisma
+* External API: OpenWeatherMap
+* Rendering Strategy: Incremental Static Regeneration
 
 ---
 
-## 🚀 Future Improvements
+## Key Engineering Decisions
 
-* Redis-based distributed caching
-* Background jobs for periodic weather updates
+### Database as Cache
+
+The database is used as the primary cache layer instead of in-memory caching, ensuring persistence and consistency.
+
+### Asynchronous Data Updates
+
+Weather updates are performed in the background to avoid blocking user requests.
+
+### Selective Data Fetching
+
+Only required fields are queried to reduce payload size and improve response time.
+
+### Controlled Revalidation
+
+UI updates only when necessary, avoiding unnecessary re-renders.
+
+---
+
+## Trade-offs
+
+* Data may be slightly stale due to asynchronous updates
+* No distributed cache layer yet
+* Background updates are not queued and lack retry logic
+
+---
+
+## Future Improvements
+
+* Redis based distributed caching
+* Background job queue for retries and scheduling
 * Rate limiting per user
-* Real-time updates with WebSockets
+* Real time updates using WebSockets
 
 ---
 
-## 📌 What I Learned
+## What This Project Demonstrates
 
-* Performance is about identifying bottlenecks layer by layer
-* Caching is easy — cache invalidation is hard
-* Backend efficiency matters more than adding features
-* Real-world systems require trade-offs
-
----
-
-## 👨‍💻 Author
-
-**Prathiush Arun**
-Backend-Focused Full-Stack Developer
+* Understanding of latency as a system level problem
+* Ability to redesign data flow for performance
+* Awareness of real world trade-offs
+* Practical use of caching and revalidation strategies
 
 ---
+
