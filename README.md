@@ -61,6 +61,7 @@ H --> I[PostgreSQL]
 G --> J[ISR Cache]
 I --> J
 J --> K[UI Render]
+```
 
 ---
 
