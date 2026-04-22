@@ -71,9 +71,11 @@ flowchart TD
     G --> J[ISR Revalidation Layer]
     I --> J
     J --> K[UI Render]
-    ```
-    ---
-    ## Key Engineering Decisions
+```
+    
+ ---
+    
+ ## Key Engineering Decisions
 
 ### Caching Strategy
 Reduces external API dependency and improves response time
