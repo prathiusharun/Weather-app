@@ -48,7 +48,7 @@ export async function addCity(formData: FormData) {
     // 2. If exists → return instantly
     if (existing) {
       refreshWeather(city); // async
-      return { success: true };
+      return ;
     }
 
     // 3. Create placeholder instantly
@@ -67,11 +67,11 @@ export async function addCity(formData: FormData) {
     refreshWeather(city);
 
     revalidatePath("/");
-    return { success: true };
+    return ;
 
   } catch (error) {
     console.error("Action Error:", error);
-    return { success: false };
+    return ;
   }
 }
 
