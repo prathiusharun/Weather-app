@@ -47,7 +47,7 @@ export async function addCity(formData: FormData) {
 
     // 2. If exists → return instantly
     if (existing) {
-      refreshWeather(city); // async
+      void refreshWeather(city); // async
       return ;
     }
 
