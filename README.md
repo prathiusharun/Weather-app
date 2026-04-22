@@ -1,6 +1,6 @@
-# Weather.IO — Performance Optimized Weather System
+# Weather.IO — Performance-Optimized Weather System
 
-A full stack weather application built with Next.js, TypeScript, and PostgreSQL, focused on latency optimization, system design, and efficient data flow.
+A full-stack weather application built with Next.js, TypeScript, and PostgreSQL, focused on real-world system performance, caching strategies, and backend efficiency.
 
 ---
 
@@ -10,156 +10,125 @@ https://weather-ey07179ip-shadows5-projects.vercel.app/
 
 ---
 
-## Why This Project Exists
+## Purpose of This Project
 
-Most weather applications are simple API wrappers that block on external requests.
+Most weather applications are simple API wrappers.
 
 This project focuses on:
 
-* removing API latency from the user experience
-* designing a read optimized system
-* applying real world caching strategies
-* understanding backend performance bottlenecks
+- reducing latency in real-world requests  
+- optimizing database and API interactions  
+- applying caching strategies  
+- designing systems with performance trade-offs  
+- understanding full request lifecycle from UI to database  
 
 ---
 
-## Performance Metrics (Lighthouse)
-
-### Mobile
-
-* First Contentful Paint: 0.8s
-* Largest Contentful Paint: 2.1s
-* Total Blocking Time: 540ms
-* Speed Index: 2.2s
+## Performance Overview
 
 ### Desktop
 
-* First Contentful Paint: 0.2s
-* Largest Contentful Paint: 0.6s
-* Total Blocking Time: 80ms
-* Speed Index: 1.3s
+- First Contentful Paint: 0.2s  
+- Largest Contentful Paint: 0.4s  
+- Total Blocking Time: 30ms  
+- Speed Index: 0.9s  
+- Cumulative Layout Shift: 0  
+
+### Mobile
+
+- First Contentful Paint: 0.8s  
+- Largest Contentful Paint: 2.1s  
+- Total Blocking Time: 40ms  
+- Speed Index: 0.8s  
+- Cumulative Layout Shift: 0  
 
 ---
 
 ## Before vs After Optimization
 
-| Metric          | Before       | After          |
-| --------------- | ------------ | -------------- |
-| Response Time   | ~2.5s        | ~500–700ms     |
-| API Calls       | Blocking     | Asynchronous   |
-| Data Source     | External API | Database First |
-| User Experience | Delayed      | Instant        |
+| Metric | Before | After |
+|--------|--------|--------|
+| Page Load Time | ~2.5s | ~400–500ms steady state |
+| API Calls | Every request | Cached / conditional fetch |
+| Database Writes | Always executed | Only on change detection |
+| Blocking Time | High | ~30–40ms |
+| System Behavior | Unstable | Predictable and optimized |
 
 ---
 
 ## System Architecture
 
-This system separates read and write paths to eliminate external API latency from user requests.
-
 ```mermaid
 flowchart TD
+A[User Request] --> B[Next.js Server Action]
 
-subgraph Client
-A[User Request]
-end
+B --> C{Cache Layer}
+C -->|Hit| D[Return Cached Data]
+C -->|Miss| E[Fetch Weather API]
 
-subgraph Server
-B[Server Action]
-C[Database]
-D[UI Response]
-end
+E --> F[Change Detection Logic]
+F -->|No Change| G[Skip Database Write]
+F -->|Change| H[Update PostgreSQL via Prisma]
 
-subgraph Background
-E[Async Worker]
-F[External API]
-G[Data Processing]
-end
+H --> I[Database Layer]
+G --> J[ISR / Revalidation Layer]
 
-A --> B
-B --> C
-C --> D
-
-B -. async .-> E
-E --> F
-F --> G
-G --> C
-
-C --> D
-```
-
----
-
-## Core Engineering Idea
-
-### Traditional Approach
-
-User waits for external API before seeing data.
-
-### Implemented Approach
-
-Database is treated as the primary data source. External API runs in the background.
-
-```ts
-refreshWeather(city)
-```
-
-This removes external latency from the critical request path.
-
----
-
-## Architecture Overview
-
-* Frontend: Next.js App Router, React, Tailwind CSS
-* Backend: Next.js Server Actions
-* Database: PostgreSQL with Prisma
-* External API: OpenWeatherMap
-* Rendering Strategy: Incremental Static Regeneration
-
----
+I --> J
+J --> K[UI Render]
 
 ## Key Engineering Decisions
 
-### Database as Cache
+### Caching Strategy
+Reduces external API dependency and improves response time.
 
-The database is used as the primary cache layer instead of in-memory caching, ensuring persistence and consistency.
+### Conditional Database Writes
+Only updates database when weather data actually changes.
 
-### Asynchronous Data Updates
+### Server Actions
+Eliminates API routes and reduces network overhead.
 
-Weather updates are performed in the background to avoid blocking user requests.
+### ISR (Incremental Static Regeneration)
+Balances freshness and performance using controlled revalidation.
 
-### Selective Data Fetching
-
-Only required fields are queried to reduce payload size and improve response time.
-
-### Controlled Revalidation
-
-UI updates only when necessary, avoiding unnecessary re-renders.
+### Selective Queries
+Fetches only required fields to reduce payload size.
 
 ---
 
 ## Trade-offs
 
-* Data may be slightly stale due to asynchronous updates
-* No distributed cache layer yet
-* Background updates are not queued and lack retry logic
+- In-memory caching resets on server restart  
+- Weather data may be slightly delayed  
+- No distributed cache layer (Redis not implemented yet)  
+- Prioritizes speed over strict real-time accuracy  
+
+---
+
+## Tech Stack
+
+- Next.js (App Router, Server Actions)
+- TypeScript
+- PostgreSQL
+- Prisma ORM
+- Tailwind CSS
+- Vercel Deployment
+
+---
+
+## Key Learnings
+
+- Performance is a system design problem, not just frontend optimization  
+- Cache invalidation is harder than caching itself  
+- Database writes are often hidden bottlenecks  
+- Small architectural changes create large performance gains  
+- Real-world systems require trade-offs between accuracy and speed  
 
 ---
 
 ## Future Improvements
 
-* Redis based distributed caching
-* Background job queue for retries and scheduling
-* Rate limiting per user
-* Real time updates using WebSockets
-
----
-
-## What This Project Demonstrates
-
-* Understanding of latency as a system level problem
-* Ability to redesign data flow for performance
-* Awareness of real world trade-offs
-* Practical use of caching and revalidation strategies
-
----
-
+- Redis-based distributed caching  
+- Background job queue for weather updates  
+- Rate limiting per user  
+- WebSockets for live updates  
+- Edge caching for global performance  
