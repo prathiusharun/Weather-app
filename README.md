@@ -46,27 +46,21 @@ This project focuses on:
 
 ---
 
-## 🏗️ Architecture Overview
+## 🏗️ System Architecture
 
-User Request
-↓
-Next.js Server Action
-↓
-🔹 Cache Layer (Check)
-  ↳ Hit → Return cached data
-  ↳ Miss → Fetch from API
-↓
-🔹 External Weather API
-↓
-🔹 Change Detection Logic
-  ↳ No Change → Skip DB
-  ↳ Change → Update DB
-↓
-🔹 PostgreSQL (Prisma)
-↓
-🔹 ISR Cache (Next.js)
-↓
-UI Render
+```mermaid
+flowchart TD
+A[User Request] --> B[Next.js Server Action]
+B --> C{Cache Layer}
+C -->|Hit| D[Return Cached Data]
+C -->|Miss| E[Fetch from Weather API]
+E --> F[Change Detection]
+F -->|No Change| G[Skip DB]
+F -->|Change| H[Update DB]
+H --> I[PostgreSQL]
+G --> J[ISR Cache]
+I --> J
+J --> K[UI Render]
 
 ---
 
