@@ -111,7 +111,7 @@ export default function WeatherUI({ savedCities = [] }: { savedCities: any[] }) 
                     <MapPin size={14} className="text-blue-500 opacity-70" />
                     <h2 className="text-2xl font-bold tracking-tight">{city.name}</h2>
                   </div>
-                  <p className="text-xs font-mono opacity-40 ml-5">{city.country} • {city.lat.toFixed(2)}°N</p>
+                  <p className="text-xs font-mono opacity-40 ml-5">{city.country} • {city.lat ? city.lat.toFixed(2) : "--"}°N</p>
                 </div>
                 <div className="text-6xl font-thin tracking-tighter">
                   {city.temp ?? "--"}°
