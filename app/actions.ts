@@ -85,10 +85,10 @@ export async function deleteCity(formData: FormData) {
     });
 
     revalidatePath("/");
-    return { success: true };
+    return;
 
   } catch (error) {
     console.error("Delete Error:", error);
-    return { success: false };
+    return ;
   }
 }
